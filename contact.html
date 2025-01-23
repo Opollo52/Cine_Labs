@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactez-Nous</title>
+    <link rel="stylesheet" href="css/contact.css">
+</head>
+<body>
+    <header>
+        <nav class="barre">
+            <div>
+                <a href="index.html"><img src="assets/img/logo.png" alt="" class="logo"></a>
+            </div>
+            <div>
+                <a href="index.html" class="effect">Accueil</a>
+                <a href="contact.html" class="effect">Contactez-Nous</a>
+                <a href="search.html" class="effect"><img src="assets/vecteur/search.png" alt=""></a>
+            </div>
+        </nav>
+    </header>
+        <section id="form-title">
+        <h1>Contactez-nous</h1>
+        <p>Une question ? Pour nous contacter, merci de bien vouloir remplir le formulaire ci-dessous.</p>
+    </section>
+    <div id="contact-container">
+        <form class="form" action="https://api.web3forms.com/submit" method="POST">
+            <div class="flex">
+                <label>
+                    <input type="hidden" name="access_key" value="e10d1c70-bd67-4929-8ca9-24bfe501b0cf">
+                    <input required="" placeholder="" type="text" class="input"  name="prenom">
+                    <span>Prénom</span>
+                </label>
+    
+                <label>
+                    <input required="" placeholder="" type="text" class="input"  name="nom">
+                    <span>Nom</span>
+                </label>
+            </div>  
+                    
+            <label>
+                <input required="" placeholder="" type="email" class="input" name="email">
+                <span>Email</span>
+            </label> 
+                
+            <label>
+                <input required="" type="tel" placeholder="" class="input" name="telephone">
+                <span>Téléphone</span>
+            </label>
+            <label>
+                <textarea required="" rows="4" placeholder="" class="input" name="message"></textarea>
+                <span>Message</span>
+            </label>
+            <button class="fancy" type="submit">
+                Envoyer
+            </button>
+        </form>
+    </div>  
+</body>
+</html>

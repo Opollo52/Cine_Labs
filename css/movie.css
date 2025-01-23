@@ -230,10 +230,10 @@ footer {
 }
 
 iframe {
-    width: 100%;
-    max-width: 640px;
-    height: auto;
-    margin: 20px auto;
+    width: 640px;
+    height: 360px;
+    margin-left: 25%;
+    margin-bottom: 5%;
 }
 
 @media (max-width: 1024px) {

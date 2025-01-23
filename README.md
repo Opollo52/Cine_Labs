@@ -5,6 +5,12 @@ Cine_Labs est un site web permettant de rechercher des films via une API. Il fou
 
 ---
 
+## 📝 Lien vers le github
+
+[Github](https://github.com/votre-utilisateur/Cine_Labs)
+
+---
+
 ## 🚀 Fonctionnalités principales
 
 - Recherche de films via une API externe.
@@ -30,7 +36,7 @@ Assurez-vous d'avoir les outils suivants installés sur votre système :
 
 1. Clonez ce dépôt :
    ```bash
-   git clone https://github.com/votre-utilisateur/Cine_Labs.git
+   git clone https://github.com/votre-utilisateur/Cine_Labs
    ```
 
 2. Configurez les variables d'environnement pour l'API :

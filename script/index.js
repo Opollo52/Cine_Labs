@@ -4,11 +4,11 @@ const apiKey = API_KEY;
 const apiUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=fr-FR`;
 let currentPage = 1;
 
-const body = document.body;
 
+const movieArea = document.getElementById('movies');
 const movieContainer = document.createElement('section');
 movieContainer.id = 'movie-container';
-body.appendChild(movieContainer);
+movieArea.appendChild(movieContainer);
 
 async function fetchMovies(page) {
     const url = new URL(apiUrl);
@@ -86,7 +86,7 @@ loadMoreButton.classList.add('btn');
 loadMoreButton.addEventListener('click', loadMoreMovies);
 
 buttonSection.appendChild(loadMoreButton);
-body.appendChild(buttonSection);
+movieArea.appendChild(buttonSection);
 
 loadMovies();
 

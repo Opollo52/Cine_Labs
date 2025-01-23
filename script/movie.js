@@ -156,26 +156,45 @@ function displayMovieDetails(movie, cast) {
 
 
 
-
-    if (movie.videos && movie.videos.results && movie.videos.results.some(video => video.type === 'Trailer' || video.type === 'Teaser')) {
+    if (
+        movie.videos &&
+        movie.videos.results &&
+        movie.videos.results.some(
+            (video) => video.type === 'Trailer' || video.type === 'Teaser'
+        )
+    ) {
         const teaserButton = document.createElement('button');
         teaserButton.className = 'viewTrailer';
         teaserButton.textContent = "Voir la bande d'annonce";
-        teaserButton.addEventListener('click', async function() {
-            const trailer = movie.videos.results.find(video => video.type === 'Trailer' || video.type === 'Teaser');
-            if (trailer) {
+        teaserButton.addEventListener('click', async function () {
+            const trailer = movie.videos.results.find(
+                (video) => video.type === 'Trailer' || video.type === 'Teaser'
+            );
+    
+            if (trailer && trailer.key) {
                 const videoContainer = document.getElementById('teaser-container');
+                
+                
                 videoContainer.innerHTML = ''; 
+    
+                
                 const teaser = document.createElement('iframe');
                 teaser.src = `https://www.youtube.com/embed/${trailer.key}`;
                 teaser.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    
                 videoContainer.appendChild(teaser);
+
+    
+                
+                videoContainer.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert('Bande-annonce non disponible pour ce film.');
             }
         });
+    
         rightContainer.appendChild(teaserButton);
     }
-
-
+    
     movieContainer.appendChild(leftContainer);
     movieContainer.appendChild(rightContainer);
 }
@@ -197,4 +216,3 @@ function displayError(message) {
     const movieContainer = document.getElementById('movie-details');
     movieContainer.innerHTML = `<p class="error">${message}</p>`;
 }
-

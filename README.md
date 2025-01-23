@@ -7,7 +7,7 @@ Cine_Labs est un site web permettant de rechercher des films via une API. Il fou
 
 ## 📝 Lien vers le github
 
-[Github](https://github.com/votre-utilisateur/Cine_Labs)
+[Github](https://github.com/Opollo52/Cine_Labs)
 
 ---
 

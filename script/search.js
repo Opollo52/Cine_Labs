@@ -101,8 +101,6 @@ document.addEventListener('click', function(event) {
 });
 
 
-/*---------------------BOUTON CHARGER PLUS DE RESULTAT---------------------------------*/
-
 async function loadMovies() {
     const movies = await fetchMovies(currentPage);
     displayMovies(movies.slice(0, 6)); 
@@ -114,6 +112,7 @@ async function loadMoreMovies() {
     displayMovies(movies);
 }
 
+const movieArea = document.getElementById('loader');
 const buttonSection = document.createElement('section');
 buttonSection.classList.add('bouton');
 
@@ -123,7 +122,8 @@ loadMoreButton.classList.add('btn');
 loadMoreButton.addEventListener('click', loadMoreMovies);
 
 buttonSection.appendChild(loadMoreButton);
-document.body.appendChild(buttonSection);
+movieArea.appendChild(buttonSection);
+
 
 loadMovies();
 
@@ -134,10 +134,5 @@ function displayMovies(movies) {
         
         const movieElement = createMovieElement(movie);
         movieContainer.appendChild(movieElement);
-        
     });
 }
-
-
-
-

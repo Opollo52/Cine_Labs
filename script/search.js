@@ -1,20 +1,52 @@
-import { API_KEY } from '../env.js';
-const apiKey = API_KEY;
+// Configuration pour l'environnement
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-
-const apiBaseUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=fr-FR`;
-
-const apiUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=fr-FR`;
+let apiKey;
+if (isDevelopment) {
+    try {
+        // Pour le développement local, importer depuis env.js
+        const { API_KEY } = await import('../env.js');
+        apiKey = API_KEY;
+    } catch {
+        console.error('Fichier env.js non trouvé pour le développement local');
+    }
+}
 
 let currentPage = 1;
 
 async function fetchMovies(page) {
     try {
-        const response = await fetch(`${apiUrl}&page=${page}`);
+        let url;
+        if (isDevelopment && apiKey) {
+            url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=fr-FR&page=${page}`;
+        } else {
+            url = `/api/movies?endpoint=trending&page=${page}`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         return data.results;
     } catch (error) {
         console.error('Erreur lors du chargement des films:', error);
+        return [];
+    }
+}
+
+async function searchMovies(query, page = 1) {
+    try {
+        let url;
+        if (isDevelopment && apiKey) {
+            url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=fr-FR&query=${encodeURIComponent(query)}&page=${page}`;
+        } else {
+            url = `/api/movies?endpoint=search&query=${encodeURIComponent(query)}&page=${page}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.results;
+    } catch (error) {
+        console.error('Erreur lors de la recherche:', error);
+        return [];
     }
 }
 
@@ -28,15 +60,11 @@ async function handleSearch(event) {
         return;
     }
 
-    const searchUrl = `${apiBaseUrl}&query=${encodeURIComponent(searchTerm)}`;
-
     try {
-        const response = await fetch(searchUrl);
-        const data = await response.json();
+        const results = await searchMovies(searchTerm);
 
-        if (!response.ok || data.results.length === 0) {
-            const error = new Error(`Erreur HTTP : ${response.status}`);
-            error.data = data;
+        if (results.length === 0) {
+            const error = new Error('Aucun résultat trouvé');
             throw error;
         }
 
@@ -44,7 +72,7 @@ async function handleSearch(event) {
         movieContainer.innerHTML = '';
 
         
-        data.results.slice(0, 6).forEach(movie => {
+        results.slice(0, 6).forEach(movie => {
             const movieElement = createMovieElement(movie);
             movieContainer.appendChild(movieElement);
         });

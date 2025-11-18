@@ -1,8 +1,58 @@
-import { API_KEY } from '../env.js';
-const apiKey = API_KEY;
+// Configuration pour l'environnement
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-const apiBaseUrl = 'https://api.themoviedb.org/3/movie';
+let apiKey;
+if (isDevelopment) {
+    try {
+        // Pour le développement local, importer depuis env.js
+        const { API_KEY } = await import('../env.js');
+        apiKey = API_KEY;
+    } catch {
+        console.error('Fichier env.js non trouvé pour le développement local');
+    }
+}
 
+// Fonction pour récupérer les détails d'un film
+async function fetchMovieDetails(movieId) {
+    try {
+        let url;
+        if (isDevelopment && apiKey) {
+            url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=fr-FR&append_to_response=videos`;
+        } else {
+            url = `/api/movies?endpoint=movie&id=${movieId}`;
+        }
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP : ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Erreur lors du chargement du film:', error);
+        throw error;
+    }
+}
+
+// Fonction pour récupérer les crédits d'un film  
+async function fetchMovieCredits(movieId) {
+    try {
+        let url;
+        if (isDevelopment && apiKey) {
+            url = `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${apiKey}&language=fr-FR`;
+        } else {
+            url = `/api/movies?endpoint=credits&id=${movieId}`;
+        }
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP : ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Erreur lors du chargement des crédits:', error);
+        throw error;
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -14,26 +64,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const movieUrl = `${apiBaseUrl}/${movieId}?api_key=${apiKey}&language=fr-FR&append_to_response=videos`;
-    console.log('API URL:', movieUrl);
-
     try {
-        const response = await fetch(movieUrl);
-        const movie = await response.json();
+        const movie = await fetchMovieDetails(movieId);
         console.log('Movie Data:', movie);
 
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP : ${response.status}`);
-        }
-
-        const creditsUrl = `${apiBaseUrl}/${movieId}/credits?api_key=${apiKey}&language=fr-FR`;
-        const creditsResponse = await fetch(creditsUrl);
-        const credits = await creditsResponse.json();
+        const credits = await fetchMovieCredits(movieId);
         console.log('Credits Data:', credits);
-
-        if (!creditsResponse.ok) {
-            throw new Error(`Erreur HTTP (Credits) : ${creditsResponse.status}`);
-        }
 
         displayMovieDetails(movie, credits.cast);
     } catch (error) {

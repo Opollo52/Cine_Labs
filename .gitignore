@@ -1,1 +1,19 @@
+# Variables d'environnement
 env.js
+.env
+.env.local
+
+# Dépendances
+node_modules/
+
+# Fichiers de cache
+.cache/
+.vercel/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

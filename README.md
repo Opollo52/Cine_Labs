@@ -11,6 +11,33 @@ Cine_Labs est un site web permettant de rechercher des films via une API. Il fou
 
 ---
 
+## 🚀 Déploiement sur Vercel
+
+### Étapes pour déployer :
+
+1. **Connecter votre repo GitHub à Vercel** :
+   - Allez sur [vercel.com](https://vercel.com)
+   - Connectez-vous avec votre compte GitHub
+   - Cliquez sur "New Project" et sélectionnez votre repo Cine_Labs
+
+2. **Configurer les variables d'environnement** :
+   - Dans le dashboard Vercel, allez dans "Settings" > "Environment Variables"
+   - Ajoutez une nouvelle variable :
+     - **Name** : `TMDB_API_KEY`
+     - **Value** : Votre clé API TMDB (6145ca8fc18ffdbfefeecbed20274aad)
+     - **Environments** : Cochez "Production", "Preview" et "Development"
+
+3. **Déployer** :
+   - Cliquez sur "Deploy"
+   - Vercel va automatiquement déployer votre site
+
+### ⚠️ Important :
+- Le fichier `env.js` ne sera **PAS** inclus dans le déploiement (exclu par `.gitignore`)
+- La clé API sera sécurisée côté serveur via les variables d'environnement Vercel
+- L'API proxy (`/api/movies.js`) gère les appels à TMDB de manière sécurisée
+
+---
+
 ## 🚀 Fonctionnalités principales
 
 - Recherche de films via une API externe.

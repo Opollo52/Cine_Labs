@@ -1,7 +1,18 @@
-import { API_KEY } from '../env.js';
-const apiKey = API_KEY;
+// Configuration pour l'environnement
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE_URL = isDevelopment ? 'http://localhost:8000' : '';
 
-const apiUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=fr-FR`;
+let apiKey;
+if (isDevelopment) {
+    try {
+        // Pour le développement local, importer depuis env.js
+        const { API_KEY } = await import('../env.js');
+        apiKey = API_KEY;
+    } catch {
+        console.error('Fichier env.js non trouvé pour le développement local');
+    }
+}
+
 let currentPage = 1;
 
 
@@ -11,15 +22,24 @@ movieContainer.id = 'movie-container';
 movieArea.appendChild(movieContainer);
 
 async function fetchMovies(page) {
-    const url = new URL(apiUrl);
-    url.searchParams.set('page', page);
-
     try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data.results;
+        let url;
+        if (isDevelopment && apiKey) {
+            // Développement local : utiliser l'API TMDB directement
+            url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=fr-FR&page=${page}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.results;
+        } else {
+            // Production : utiliser notre API proxy
+            url = `/api/movies?endpoint=trending&page=${page}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.results;
+        }
     } catch (error) {
         console.error('Erreur lors du chargement des films:', error);
+        return [];
     }
 }
 

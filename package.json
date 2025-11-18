@@ -1,0 +1,13 @@
+{
+  "name": "cine-labs",
+  "version": "1.0.0",
+  "description": "Site de recherche de films utilisant l'API TMDB",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": ["movies", "cinema", "tmdb", "api"],
+  "author": "CineLabs Team",
+  "license": "MIT"
+}

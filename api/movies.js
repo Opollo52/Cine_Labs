@@ -1,5 +1,5 @@
-// API Route pour proxy vers TMDB - Version CommonJS pour Vercel
-module.exports = function handler(req, res) {
+// API Route pour proxy vers TMDB - Version ES6 pour Vercel
+export default async function handler(req, res) {
   // Activer CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -25,7 +25,11 @@ module.exports = function handler(req, res) {
 
   if (!apiKey) {
     console.error('API Key manquante');
-    return res.status(500).json({ error: 'API Key manquante', debug: 'TMDB_API_KEY non trouvée' });
+    return res.status(500).json({ 
+      error: 'API Key manquante', 
+      debug: 'TMDB_API_KEY non trouvée',
+      env: Object.keys(process.env).filter(key => key.includes('TMDB')).join(', ') 
+    });
   }
 
   // Construire l'URL TMDB
@@ -59,49 +63,25 @@ module.exports = function handler(req, res) {
 
   console.log('URL TMDB:', tmdbUrl);
   
-  // Utiliser le module https natif de Node.js
-  const https = require('https');
-  const url = require('url');
-  
-  const parsedUrl = url.parse(tmdbUrl);
-  
-  const options = {
-    hostname: parsedUrl.hostname,
-    port: 443,
-    path: parsedUrl.path,
-    method: 'GET'
-  };
-
-  const request = https.request(options, (response) => {
-    let data = '';
-
-    response.on('data', (chunk) => {
-      data += chunk;
-    });
-
-    response.on('end', () => {
-      try {
-        const jsonData = JSON.parse(data);
-        console.log('Statut TMDB: OK');
-        console.log('Données reçues:', jsonData.results ? `${jsonData.results.length} résultats` : 'Pas de résultats');
-        res.status(200).json(jsonData);
-      } catch (error) {
-        console.error('Erreur parsing JSON:', error.message);
-        res.status(500).json({ 
-          error: 'Erreur parsing réponse TMDB',
-          debug: error.message 
-        });
-      }
-    });
-  });
-
-  request.on('error', (error) => {
-    console.error('Erreur requête HTTPS:', error.message);
+  try {
+    // Utiliser fetch moderne
+    const response = await fetch(tmdbUrl);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(`TMDB API Error: ${response.status} - ${data.status_message || 'Erreur inconnue'}`);
+    }
+    
+    console.log('Statut TMDB: OK');
+    console.log('Données reçues:', data.results ? `${data.results.length} résultats` : 'Pas de résultats');
+    
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Erreur API:', error.message);
     res.status(500).json({ 
       error: 'Erreur lors de la récupération des données',
-      debug: error.message 
+      debug: error.message,
+      url: tmdbUrl.replace(apiKey, 'API_KEY_MASQUEE')
     });
-  });
-
-  request.end();
-};
+  }
+}

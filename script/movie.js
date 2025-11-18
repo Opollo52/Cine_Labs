@@ -2,13 +2,18 @@
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 let apiKey;
-if (isDevelopment) {
-    try {
-        // Pour le développement local, importer depuis env.js
-        const { API_KEY } = await import('../env.js');
-        apiKey = API_KEY;
-    } catch {
-        console.error('Fichier env.js non trouvé pour le développement local');
+
+// Fonction pour initialiser la clé API en développement local
+async function initializeApiKey() {
+    if (isDevelopment) {
+        try {
+            // Pour le développement local, importer depuis env.js
+            const { API_KEY } = await import('../env.js');
+            apiKey = API_KEY;
+            console.log('Clé API chargée pour le développement local');
+        } catch (error) {
+            console.error('Fichier env.js non trouvé pour le développement local:', error);
+        }
     }
 }
 
@@ -55,6 +60,8 @@ async function fetchMovieCredits(movieId) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    await initializeApiKey(); // S'assurer que la clé API est chargée
+    
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
     console.log('Movie ID:', movieId);

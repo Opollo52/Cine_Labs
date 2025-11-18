@@ -1,15 +1,19 @@
 // Configuration pour l'environnement
 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const API_BASE_URL = isDevelopment ? 'http://localhost:8000' : '';
 
 let apiKey;
-if (isDevelopment) {
-    try {
-        // Pour le développement local, importer depuis env.js
-        const { API_KEY } = await import('../env.js');
-        apiKey = API_KEY;
-    } catch {
-        console.error('Fichier env.js non trouvé pour le développement local');
+
+// Fonction pour initialiser la clé API en développement local
+async function initializeApiKey() {
+    if (isDevelopment) {
+        try {
+            // Pour le développement local, importer depuis env.js
+            const { API_KEY } = await import('../env.js');
+            apiKey = API_KEY;
+            console.log('Clé API chargée pour le développement local');
+        } catch (error) {
+            console.error('Fichier env.js non trouvé pour le développement local:', error);
+        }
     }
 }
 
@@ -27,15 +31,27 @@ async function fetchMovies(page) {
         if (isDevelopment && apiKey) {
             // Développement local : utiliser l'API TMDB directement
             url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=fr-FR&page=${page}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data.results;
+            console.log('Mode développement - URL directe TMDB');
         } else {
             // Production : utiliser notre API proxy
             url = `/api/movies?endpoint=trending&page=${page}`;
-            const response = await fetch(url);
-            const data = await response.json();
+            console.log('Mode production - API proxy');
+        }
+        
+        console.log('Appel API vers:', url);
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Données reçues:', data);
+        
+        if (isDevelopment && apiKey) {
             return data.results;
+        } else {
+            return data.results || [];
         }
     } catch (error) {
         console.error('Erreur lors du chargement des films:', error);
@@ -64,6 +80,7 @@ function displayMovies(movies) {
 }
 
 async function loadMovies() {
+    await initializeApiKey(); // S'assurer que la clé API est chargée
     const movies = await fetchMovies(currentPage);
     displayMovies(movies.slice(0, 6)); 
 }

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Vercel - CinéLabs</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Vercel - CinéLabs</h1>
+    <div id="results"></div>
+    <button onclick="runTests()">🔄 Relancer les tests</button>
+
+    <script>
+        async function runTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="info">Tests en cours...</div>';
+            
+            const tests = [];
+            
+            // Test 1: Environnement
+            tests.push({
+                name: 'Environnement',
+                test: async () => {
+                    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    return {
+                        success: true,
+                        message: `Mode: ${isDev ? 'Développement' : 'Production'}`,
+                        data: {
+                            hostname: window.location.hostname,
+                            href: window.location.href,
+                            isDevelopment: isDev
+                        }
+                    };
+                }
+            });
+            
+            // Test 2: API Trending
+            tests.push({
+                name: 'API Films Populaires',
+                test: async () => {
+                    try {
+                        const response = await fetch('/api/movies?endpoint=trending&page=1');
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${data.error || 'Erreur inconnue'}`);
+                        }
+                        
+                        return {
+                            success: true,
+                            message: `${data.results?.length || 0} films récupérés`,
+                            data: data
+                        };
+                    } catch (error) {
+                        return {
+                            success: false,
+                            message: error.message,
+                            data: error
+                        };
+                    }
+                }
+            });
+            
+            // Test 3: API Movie Detail
+            tests.push({
+                name: 'API Détail Film',
+                test: async () => {
+                    try {
+                        const response = await fetch('/api/movies?endpoint=movie&id=299536');
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${data.error || 'Erreur inconnue'}`);
+                        }
+                        
+                        return {
+                            success: true,
+                            message: `Film: ${data.title || 'Titre inconnu'}`,
+                            data: { title: data.title, id: data.id }
+                        };
+                    } catch (error) {
+                        return {
+                            success: false,
+                            message: error.message,
+                            data: error
+                        };
+                    }
+                }
+            });
+            
+            // Test 4: API Search
+            tests.push({
+                name: 'API Recherche',
+                test: async () => {
+                    try {
+                        const response = await fetch('/api/movies?endpoint=search&query=batman');
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${data.error || 'Erreur inconnue'}`);
+                        }
+                        
+                        return {
+                            success: true,
+                            message: `${data.results?.length || 0} résultats pour "batman"`,
+                            data: { total_results: data.total_results, results_count: data.results?.length }
+                        };
+                    } catch (error) {
+                        return {
+                            success: false,
+                            message: error.message,
+                            data: error
+                        };
+                    }
+                }
+            });
+            
+            // Exécuter tous les tests
+            let html = '';
+            for (const test of tests) {
+                try {
+                    const result = await test.test();
+                    const className = result.success ? 'success' : 'error';
+                    html += `
+                        <div class="status ${className}">
+                            <strong>${test.name}:</strong> ${result.message}
+                            <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                        </div>
+                    `;
+                } catch (error) {
+                    html += `
+                        <div class="status error">
+                            <strong>${test.name}:</strong> Erreur critique
+                            <pre>${error.message}</pre>
+                        </div>
+                    `;
+                }
+            }
+            
+            results.innerHTML = html;
+        }
+        
+        // Lancer les tests automatiquement
+        runTests();
+    </script>
+</body>
+</html>
